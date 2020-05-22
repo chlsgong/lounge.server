@@ -9,11 +9,21 @@ const config = require('./config.json');
 
 io.on('connect', socket => {
   // TODO: do something with socket
-  console.log('A user connected');
+  // console.log('A user connected');
+  
+  socket.on('create-lounge', data => {
+    console.log('host lounge created');+ 
+  });
+
+  socket.on('join-lounge', data => {
+    console.log('user joined this lounge');
+  });
 
   socket.on('add-to-queue', data => {
     console.log(data);
-  })
+    
+    io.emit('add-to-queue', data);
+  });
 });
 
 // Endpoints

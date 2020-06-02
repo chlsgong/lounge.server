@@ -12,11 +12,15 @@ io.on('connect', socket => {
   // console.log('A user connected');
   
   socket.on('create-lounge', data => {
-    console.log('host lounge created');+ 
+    console.log('host created a lounge', data);
+
+    this.token = data.token;
   });
 
   socket.on('join-lounge', data => {
     console.log('user joined this lounge');
+
+    io.emit('pass-token', { token: this.token });
   });
 
   socket.on('add-to-queue', data => {
@@ -33,7 +37,7 @@ app.get('/', (_, res) => {
 });
 
 // TODO: create room
-// TOOD: join room
+// TODO: join room
 
 // Start server
 const { port } = config;

@@ -1,5 +1,12 @@
-const app = require('express')();
-const server = require('http').createServer(app);
+const express = require('express');
+const app = express();
+const fs = require('fs');
+const https = require('https');
+// const server = require('http').createServer(app);
+const server = https.createServer({
+  key: fs.readFileSync('ssl/chlsgong_com.key'),
+  cert: fs.readFileSync('ssl/chlsgong_com.crt'),
+}, app);
 const io = require('socket.io')(server);
 
 // Load configurations
@@ -8,9 +15,6 @@ const config = require('./config.json');
 // Socket
 
 io.on('connect', socket => {
-  // TODO: do something with socket
-  // console.log('A user connected');
-  
   socket.on('create-lounge', data => {
     console.log('host created a lounge', data);
 
@@ -36,11 +40,8 @@ app.get('/', (_, res) => {
   res.send('Hello World!');
 });
 
-// TODO: create room
-// TODO: join room
-
 // Start server
-const { port } = config;
-server.listen(port, () => {
-  console.log(`App listening on port ${port}!`);
+const { sslPort } = config;
+server.listen(sslPort, () => {
+  console.log(`App listening on port ${sslPort}!`);
 });

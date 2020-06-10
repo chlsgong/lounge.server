@@ -3,8 +3,11 @@ const app = express();
 const fs = require('fs');
 const https = require('https');
 const socketIO = require('socket.io');
+const uuid = require('uuid');
+const _ = require('lodash');
 
 const loungeMgr = require('./lounge-manager');
+const commonUtils = require('./utils/common');
 
 // Load configurations
 const config = require('./config.json');
@@ -20,29 +23,40 @@ const io = socketIO(server);
 
 io.on('connect', socket => {
   socket.on('create-lounge', data => {
-    const { id } = socket;
     const { token } = data;
+    const id = uuid.v4();
+    const loungeCode = commonUtils.createBase36(6);
 
     console.log('host created a lounge:', id);
+    console.log('lounge code:', loungeCode);
     console.log('token:', data);
 
-    loungeMgr.add(id, token);
+    loungeMgr.add(id, loungeCode, token);
+
+    socket.join(id, () => {
+      io.to(id).emit('pass-lounge-code', { loungeCode });
+    });
   });
 
   socket.on('join-lounge', data => {
-    const { id } = data;
+    const { code } = data;
 
-    console.log('user joined this lounge:', id);
-    
+    console.log('user joined this lounge:', code);
+    const id = _.get(loungeMgr.getLoungeId(code), 'id');
+
+    if (!id) {
+      socket.emit('lounge-not-found', { code });
+      return;
+    }
+
     socket.join(id, () => {
-      const lounge = loungeMgr.get(id);
+      const token = _.get(loungeMgr.getLounge(id), 'token');
 
-      if (!lounge) {
-        io.to(socket.id).emit('lounge-not-found', { id });
-        return;
-      }
-
-      io.to(socket.id).emit('pass-token', { token: lounge.token });
+      socket.emit('pass-lounge-info', {
+        id,
+        code,
+        token,
+      });
     });
   });
 

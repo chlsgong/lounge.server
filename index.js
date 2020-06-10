@@ -2,35 +2,54 @@ const express = require('express');
 const app = express();
 const fs = require('fs');
 const https = require('https');
-// const server = require('http').createServer(app);
+const socketIO = require('socket.io');
+
+const loungeMgr = require('./lounge-manager');
+
+// Load configurations
+const config = require('./config.json');
+
+// Create server
 const server = https.createServer({
   key: fs.readFileSync('ssl/chlsgong_com.key'),
   cert: fs.readFileSync('ssl/chlsgong_com.crt'),
 }, app);
-const io = require('socket.io')(server);
-
-// Load configurations
-const config = require('./config.json');
+const io = socketIO(server);
 
 // Socket
 
 io.on('connect', socket => {
   socket.on('create-lounge', data => {
-    console.log('host created a lounge', data);
+    const { id } = socket;
+    const { token } = data;
 
-    this.token = data.token;
+    console.log('host created a lounge:', id);
+    console.log('token:', data);
+
+    loungeMgr.add(id, token);
   });
 
   socket.on('join-lounge', data => {
-    console.log('user joined this lounge');
+    const { id } = data;
 
-    io.emit('pass-token', { token: this.token });
+    console.log('user joined this lounge:', id);
+    
+    socket.join(id, () => {
+      const lounge = loungeMgr.get(id);
+
+      if (!lounge) {
+        io.to(socket.id).emit('lounge-not-found', { id });
+        return;
+      }
+
+      io.to(socket.id).emit('pass-token', { token: lounge.token });
+    });
   });
 
   socket.on('add-to-queue', data => {
     console.log(data);
     
-    io.emit('add-to-queue', data);
+    io.to(data.id).emit('add-to-queue', data );
   });
 });
 

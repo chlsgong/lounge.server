@@ -8,6 +8,8 @@ const _ = require('lodash');
 
 const loungeMgr = require('./lounge-manager');
 const commonUtils = require('./utils/common');
+const users = require('./db/users');
+const lounges = require('./db/lounges');
 
 // Load configurations
 const config = require('./config.json');
@@ -71,6 +73,8 @@ io.on('connect', socket => {
 
 app.get('/', (_, res) => {
   res.send('Hello World!');
+
+  users.getUser('chaarlesmusic');
 });
 
 // Start server

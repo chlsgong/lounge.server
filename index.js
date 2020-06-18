@@ -8,8 +8,9 @@ const _ = require('lodash');
 
 const loungeMgr = require('./lounge-manager');
 const commonUtils = require('./utils/common');
+const mongooseClient = require('./db/mongoose-client');
 const users = require('./db/users');
-const lounges = require('./db/lounges');
+// const lounges = require('./db/lounges');
 
 // Load configurations
 const config = require('./config.json');
@@ -20,6 +21,9 @@ const server = https.createServer({
   cert: fs.readFileSync('ssl/chlsgong_com.crt'),
 }, app);
 const io = socketIO(server);
+
+// Connect to database
+mongooseClient.connect();
 
 // Socket
 
@@ -74,7 +78,8 @@ io.on('connect', socket => {
 app.get('/', (_, res) => {
   res.send('Hello World!');
 
-  users.getUser('chaarlesmusic');
+  // users.getUser('chaarlesmusic');
+  // users.saveUser();
 });
 
 // Start server

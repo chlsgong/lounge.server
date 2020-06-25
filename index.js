@@ -89,7 +89,7 @@ app.use(bodyParser.json());
 app.post('/user', (req, res) => {
   console.log('request data:', req.body);
 
-  const spotifyId = _.get(req.body, 'spotifyId');
+  const spotifyId = _.get(req.body, 'spotify_id');
 
   if (spotifyId) res.sendStatus(200);
   else res.sendStatus(406);
@@ -98,7 +98,7 @@ app.post('/user', (req, res) => {
 app.get('/user', (req, res) => {
   console.log('request data:', req.query);
 
-  const spotifyId = _.get(req.query, 'spotifyId');
+  const spotifyId = _.get(req.query, 'spotify_id');
 
   if (spotifyId) {
     users.getUser('chaarlesmusic')

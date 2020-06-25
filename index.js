@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
 const socketIO = require('socket.io');
@@ -69,7 +70,7 @@ io.on('connect', socket => {
   socket.on('add-to-queue', data => {
     console.log(data);
     
-    io.to(data.id).emit('add-to-queue', data );
+    io.to(data.id).emit('add-to-queue', data);
   });
 });
 
@@ -78,8 +79,33 @@ io.on('connect', socket => {
 app.get('/', (_, res) => {
   res.send('Hello World!');
 
-  // users.getUser('chaarlesmusic');
+  users.getUser('chaarlesmusic').then(data => console.log(data));
   // users.saveUser();
+});
+
+// User
+
+app.use(bodyParser.json());
+app.post('/user', (req, res) => {
+  console.log('request data:', req.body);
+
+  const spotifyId = _.get(req.body, 'spotifyId');
+
+  if (spotifyId) res.sendStatus(200);
+  else res.sendStatus(406);
+});
+
+app.get('/user', (req, res) => {
+  console.log('request data:', req.query);
+
+  const spotifyId = _.get(req.query, 'spotifyId');
+
+  if (spotifyId) {
+    users.getUser('chaarlesmusic')
+      .then(data => res.send(data))
+      .catch(_ => res.sendStatus(404));
+  }
+  else res.sendStatus(406);
 });
 
 // Start server

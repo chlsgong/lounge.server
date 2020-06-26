@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
@@ -76,6 +77,9 @@ io.on('connect', socket => {
 
 // Endpoints
 
+// TODO: configure cors to only allow webapp origin
+app.use(cors());
+
 app.get('/', (_, res) => {
   res.send('Hello World!');
 
@@ -91,19 +95,29 @@ app.post('/user', (req, res) => {
 
   const spotifyId = _.get(req.body, 'spotify_id');
 
-  if (spotifyId) res.sendStatus(200);
+  if (spotifyId) {
+    users.createUser(spotifyId)
+      .then(_ => res.send('User created'))
+      .catch(_ => res.sendStatus(500));  
+  }
   else res.sendStatus(406);
 });
 
 app.get('/user', (req, res) => {
   console.log('request data:', req.query);
 
+  // res.sendStatus(404);
+  // return;
+
   const spotifyId = _.get(req.query, 'spotify_id');
 
   if (spotifyId) {
-    users.getUser('chaarlesmusic')
-      .then(data => res.send(data))
-      .catch(_ => res.sendStatus(404));
+    users.getUser(spotifyId)
+      .then(data => {
+        if (data) res.send(data);
+        else res.sendStatus(404);
+      })
+      .catch(_ => res.sendStatus(500));
   }
   else res.sendStatus(406);
 });

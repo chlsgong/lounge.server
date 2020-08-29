@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "start:db": "sudo systemctl start mongod"
+    "start:db": "sudo systemctl start mongod",
+    "ports": "netstat -tulpn"
   },
   "author": "Charles Gong",
   "license": "ISC",

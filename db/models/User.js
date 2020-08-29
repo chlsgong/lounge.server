@@ -11,6 +11,7 @@ const userSchema = new Schema({
   })],
 });
 
+// Parameters include: name of model, schema, collection
 const User = model('User', userSchema, 'users');
 
 module.exports = User;

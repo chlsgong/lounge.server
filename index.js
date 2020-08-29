@@ -12,7 +12,7 @@ const loungeMgr = require('./lounge-manager');
 const commonUtils = require('./utils/common');
 const mongooseClient = require('./db/mongoose-client');
 const users = require('./db/users');
-// const lounges = require('./db/lounges');
+const lounges = require('./db/lounges');
 
 // Load configurations
 const config = require('./config.json');
@@ -120,6 +120,22 @@ app.get('/user', (req, res) => {
       .catch(_ => res.sendStatus(500));
   }
   else res.sendStatus(406);
+});
+
+// Lounge
+
+app.use(bodyParser.json());
+app.post('/lounge', (req, res) => {
+  console.log('request data:', req.body);
+
+  const hostId = _.get(req.query, 'host_id');
+  const name = _.get(req.query, 'name');
+  const refreshToken = _.get(req.query, 'refresh_token');
+  const code = '123ABC';
+
+  lounges.createLounge({ hostId, name, code, refreshToken })
+    .then(_ => res.send('Lounge created'))
+    .catch(_ => res.sendStatus(500));  
 });
 
 // Start server

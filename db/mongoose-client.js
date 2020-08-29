@@ -9,8 +9,8 @@ const connect = () => {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   })
-    .then(() => console.log("Connected successfully to server"))
-    .catch(err => console.log("Error connecting to server", err));
+    .then(() => console.log("Connected successfully to database server"))
+    .catch(err => console.log("Error connecting to database server", err));
 }
 
 module.exports = {

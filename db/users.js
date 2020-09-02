@@ -13,7 +13,14 @@ const createUser = spotifyId => {
   });
 
   return user.save();
-}
+};
+
+const updateUser = ({ userId, lounge }) => {
+  return User.findOneAndUpdate(
+    { _id: userId },
+    { $push: { lounges: lounge }}
+  );
+};
 
 // const saveUser = user => {
 //   const user = new User({
@@ -32,5 +39,6 @@ const createUser = spotifyId => {
 
 module.exports = {
   getUser,
-  createUser
+  createUser,
+  updateUser,
 };

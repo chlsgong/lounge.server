@@ -128,12 +128,26 @@ app.use(bodyParser.json());
 app.post('/lounge', (req, res) => {
   console.log('request data:', req.body);
 
-  const hostId = _.get(req.query, 'host_id');
-  const name = _.get(req.query, 'name');
-  const refreshToken = _.get(req.query, 'refresh_token');
-  const code = '123ABC';
+  const hostId = _.get(req.body, 'host_id');
+  const name = _.get(req.body, 'name');
+  const refreshToken = _.get(req.body, 'refresh_token');
+  const code = commonUtils.createBase36(6);
 
+  // create lounge
   lounges.createLounge({ hostId, name, code, refreshToken })
+    .then(lounge => {
+      // TODO: maybe use Schema middleware??
+
+      // update user's lounge array
+      return users.updateUser({
+        userId: hostId,
+        lounge: {
+          _id: lounge._id,
+          name: lounge.name,
+          code: lounge.code,
+        },
+      });
+    })
     .then(_ => res.send('Lounge created'))
     .catch(_ => res.sendStatus(500));  
 });

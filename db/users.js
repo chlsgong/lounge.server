@@ -4,7 +4,8 @@ const User = require('./models/User');
 
 // const { Types } = mongoose;
 
-const getUser = spotifyId => User.findOne({ spotifyId });
+const getUserById = id => User.findById(id);
+const getUserBySpotifyId = spotifyId => User.findOne({ spotifyId });
 
 const createUser = spotifyId => {
   const user = new User({
@@ -38,7 +39,8 @@ const updateUser = ({ userId, lounge }) => {
 // }
 
 module.exports = {
-  getUser,
+  getUserById,
+  getUserBySpotifyId,
   createUser,
   updateUser,
 };

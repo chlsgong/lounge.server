@@ -110,12 +110,21 @@ app.get('/user', (req, res) => {
   // return;
 
   const spotifyId = _.get(req.query, 'spotify_id');
+  const userId = _.get(req.query, 'user_id');
 
   if (spotifyId) {
-    users.getUser(spotifyId)
+    users.getUserBySpotifyId(spotifyId)
       .then(data => {
         if (data) res.send(data);
-        else res.sendStatus(404);
+        else res.status(404).send({ reason: 'spotifyUserNotFound' });
+      })
+      .catch(_ => res.sendStatus(500));
+  }
+  else if (userId) {
+    users.getUserById(userId)
+      .then(data => {
+        if (data) res.send(data);
+        else res.status(404).send({ reason: 'loungeUserNotFound' });
       })
       .catch(_ => res.sendStatus(500));
   }
@@ -150,6 +159,9 @@ app.post('/lounge', (req, res) => {
     })
     .then(_ => res.send('Lounge created'))
     .catch(_ => res.sendStatus(500));  
+});
+
+app.get('/lounge', (req, res) => {
 });
 
 // Start server

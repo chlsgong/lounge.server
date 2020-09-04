@@ -4,6 +4,7 @@ const { ObjectId, Schema, model } = mongoose;
 
 const userSchema = new Schema({
   spotifyId: String,
+  activeLoungeId: ObjectId,
   lounges: [new Schema({
     _id: ObjectId,
     name: String,

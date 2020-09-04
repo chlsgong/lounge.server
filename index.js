@@ -13,9 +13,11 @@ const commonUtils = require('./utils/common');
 const mongooseClient = require('./db/mongoose-client');
 const users = require('./db/users');
 const lounges = require('./db/lounges');
+const activeLounges = require('./db/activeLounges');
 
 // Load configurations
 const config = require('./config.json');
+const { ObjectId } = require('mongodb');
 
 // Create server
 const server = https.createServer({
@@ -148,7 +150,7 @@ app.post('/lounge', (req, res) => {
       // TODO: maybe use Schema middleware??
 
       // update user's lounge array
-      return users.updateUser({
+      return users.updateUserLounges({
         userId: hostId,
         lounge: {
           _id: lounge._id,
@@ -162,6 +164,57 @@ app.post('/lounge', (req, res) => {
 });
 
 app.get('/lounge', (req, res) => {
+});
+
+app.post('/lounge/open', (req, res) => {
+  console.log('request data:', req.body);
+
+  const userId = req.body?.user_id;
+  const loungeId = req.body?.lounge_id;
+
+  lounges.getLounge(loungeId)
+    .then(lounge => {
+      const { code } = lounge;
+
+      // open lounge
+      return activeLounges.createActiveLounge({ loungeId, code });
+    })
+    .then(activeLounge => {
+      res.send(activeLounge);
+
+      // update user active lounge
+      const activeLoungeId = activeLounge.loungeId;
+      return users.updateUserActiveLounge({ userId, activeLoungeId });
+    })
+    .catch(_ => res.sendStatus(500));
+});
+
+app.post('/lounge/close', (req, res) => {
+  console.log('request data:', req.body);
+
+  const userId = req.body?.user_id;
+  const loungeId = req.body?.lounge_id;
+
+  // close lounge
+  activeLounges.deleteActiveLounge(loungeId)
+    .then(_ => {
+      res.send('Lounge closed');
+
+      // remove user active lounge
+      return users.updateUserActiveLounge({ userId, activeLoungeId: null });
+    })
+    .catch(_ => res.sendStatus(500));
+});
+
+app.put('/user/test', (req, res) => {
+  console.log('request data:', req.body);
+
+  const userId = req.body?.user_id;
+  const activeLoungeId = req.body?.lounge_id;
+
+  users.updateUserActiveLounge({ userId, activeLoungeId: ObjectId(activeLoungeId) })
+    .then(data => res.send(data))
+    .catch(_ => res.sendStatus(500));
 });
 
 // Start server

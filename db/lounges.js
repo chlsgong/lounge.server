@@ -6,6 +6,8 @@ const Lounge = require('./models/Lounge');
 
 // const getUser = spotifyId => User.findOne({ spotifyId });
 
+const getLounge = id => Lounge.findById(id);
+
 const createLounge = ({ hostId, name, code, refreshToken }) => {
   const lounge = new Lounge({
     hostId,
@@ -17,7 +19,7 @@ const createLounge = ({ hostId, name, code, refreshToken }) => {
   });
 
   return lounge.save();
-}
+};
 
 // const saveUser = user => {
 //   const user = new User({
@@ -35,5 +37,6 @@ const createLounge = ({ hostId, name, code, refreshToken }) => {
 // }
 
 module.exports = {
+  getLounge,
   createLounge,
 };

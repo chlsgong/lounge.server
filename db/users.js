@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const _ = require('lodash');
 const User = require('./models/User');
+const { ObjectId } = require('mongodb');
 
 // const { Types } = mongoose;
 
@@ -10,16 +11,24 @@ const getUserBySpotifyId = spotifyId => User.findOne({ spotifyId });
 const createUser = spotifyId => {
   const user = new User({
     spotifyId,
+    activeLoungeId: null,
     lounges: [],
   });
 
   return user.save();
 };
 
-const updateUser = ({ userId, lounge }) => {
+const updateUserLounges = ({ userId, lounge }) => {
   return User.findOneAndUpdate(
     { _id: userId },
-    { $push: { lounges: lounge }}
+    { $push: { lounges: lounge }},
+  );
+};
+
+const updateUserActiveLounge = ({ userId, activeLoungeId }) => {
+  return User.findOneAndUpdate(
+    { _id: userId },
+    { activeLoungeId },
   );
 };
 
@@ -42,5 +51,6 @@ module.exports = {
   getUserById,
   getUserBySpotifyId,
   createUser,
-  updateUser,
+  updateUserLounges,
+  updateUserActiveLounge,
 };

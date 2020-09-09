@@ -8,6 +8,7 @@ const connect = () => {
   mongoose.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
+    useFindAndModify: false,
   })
     .then(() => console.log("Connected successfully to database server"))
     .catch(err => console.log("Error connecting to database server", err));

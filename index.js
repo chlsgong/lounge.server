@@ -85,7 +85,7 @@ app.use(cors());
 app.get('/', (_, res) => {
   res.send('Hello World!');
 
-  users.getUser('chaarlesmusic').then(data => console.log(data));
+  // users.getUser('chaarlesmusic').then(data => console.log(data));
   // users.saveUser();
 });
 
@@ -142,6 +142,7 @@ app.post('/lounge', (req, res) => {
   const hostId = _.get(req.body, 'host_id');
   const name = _.get(req.body, 'name');
   const refreshToken = _.get(req.body, 'refresh_token');
+  // TODO: remove here and generate in active lounges
   const code = commonUtils.createBase36(6);
 
   // create lounge
@@ -164,6 +165,16 @@ app.post('/lounge', (req, res) => {
 });
 
 app.get('/lounge', (req, res) => {
+  console.log('request data:', req.query);
+
+  const loungeId = req.query?.lounge_id;
+
+  lounges.getLounge(loungeId)
+    .then(data => {
+      if (data) res.send(data);
+      else res.status(404).send({ reason: 'loungeNotFound' });
+    })
+    .catch(_ => res.sendStatus(500));
 });
 
 app.post('/lounge/open', (req, res) => {
@@ -205,6 +216,21 @@ app.post('/lounge/close', (req, res) => {
     })
     .catch(_ => res.sendStatus(500));
 });
+
+app.get('/lounge/join', (req, res) => {
+  console.log('request data:', req.query);
+
+  const code = req.query?.code;
+
+  activeLounges.getActiveLoungeByCode(code)
+    .then(data => {
+      if (data) res.send(data);
+      else res.status(404).send({ reason: 'activeLoungeNotFound' });
+    })
+    .catch(_ => res.sendStatus(500));
+});
+
+// Test
 
 app.put('/user/test', (req, res) => {
   console.log('request data:', req.body);

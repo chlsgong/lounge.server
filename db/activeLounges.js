@@ -13,7 +13,10 @@ const deleteActiveLounge = loungeId => {
   return ActiveLounge.deleteOne({ loungeId });
 };
 
+const getActiveLoungeByCode = code => ActiveLounge.findOne({ code });
+
 module.exports = {
   createActiveLounge,
   deleteActiveLounge,
+  getActiveLoungeByCode,
 };

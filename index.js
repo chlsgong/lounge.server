@@ -183,7 +183,15 @@ app.post('/lounge/open', (req, res) => {
   const userId = req.body?.user_id;
   const loungeId = req.body?.lounge_id;
 
-  lounges.getLounge(loungeId)
+  users.getUserById(userId)
+    .then(user => {
+      const { activeLoungeId } = user;
+      if (!activeLoungeId) return Promise.resolve();
+      else res.status(409).send({ reason: 'activeLoungeAlreadyExists' });
+    })
+    .then(_ => {
+      return lounges.getLounge(loungeId);
+    })
     .then(lounge => {
       const { code } = lounge;
 

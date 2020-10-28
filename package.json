@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "start:db": "sudo systemctl start mongod",
-    "start:db:mac": "mongod --dbpath=/Users/charles/Documents/workspace/skydragon/lounge/lounge.server/data/db",
+    "db": "sudo systemctl start mongod",
+    "db:mac": "mongod --dbpath=/Users/charles/Documents/workspace/skydragon/lounge/lounge.server/data/db",
     "ports": "netstat -tulpn"
   },
   "author": "Charles Gong",

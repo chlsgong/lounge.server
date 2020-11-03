@@ -4,11 +4,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
-const socketIO = require('socket.io');
-const uuid = require('uuid');
 const _ = require('lodash');
 
-const loungeMgr = require('./lounge-manager');
 const commonUtils = require('./utils/common');
 const mongooseClient = require('./db/mongoose-client');
 const users = require('./db/users');
@@ -24,58 +21,9 @@ const server = https.createServer({
   key: fs.readFileSync('ssl/chlsgong_com.key'),
   cert: fs.readFileSync('ssl/chlsgong_com.crt'),
 }, app);
-const io = socketIO(server);
 
 // Connect to database
 mongooseClient.connect();
-
-// Socket
-
-io.on('connect', socket => {
-  socket.on('create-lounge', data => {
-    const { token } = data;
-    const id = uuid.v4();
-    const loungeCode = commonUtils.createBase36(6);
-
-    console.log('host created a lounge:', id);
-    console.log('lounge code:', loungeCode);
-    console.log('token:', data);
-
-    loungeMgr.add(id, loungeCode, token);
-
-    socket.join(id, () => {
-      io.to(id).emit('pass-lounge-code', { loungeCode });
-    });
-  });
-
-  socket.on('join-lounge', data => {
-    const { code } = data;
-
-    console.log('user joined this lounge:', code);
-    const id = _.get(loungeMgr.getLoungeId(code), 'id');
-
-    if (!id) {
-      socket.emit('lounge-not-found', { code });
-      return;
-    }
-
-    socket.join(id, () => {
-      const token = _.get(loungeMgr.getLounge(id), 'token');
-
-      socket.emit('pass-lounge-info', {
-        id,
-        code,
-        token,
-      });
-    });
-  });
-
-  socket.on('add-to-queue', data => {
-    console.log(data);
-    
-    io.to(data.id).emit('add-to-queue', data);
-  });
-});
 
 // Endpoints
 

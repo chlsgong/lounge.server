@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "db": "sudo systemctl start mongod",
     "db:mac": "mongod --dbpath=/Users/charles/Documents/workspace/skydragon/lounge/lounge.server/data/db",
     "ports": "netstat -tulpn"
@@ -20,5 +20,8 @@
     "mongoose": "^5.9.19",
     "socket.io": "^2.3.0",
     "uuid": "^8.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
   }
 }

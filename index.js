@@ -1,10 +1,14 @@
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const https = require('https');
+const socket = require('socket.io');
 const _ = require('lodash');
+const { ObjectId } = require('mongodb');
 
 const commonUtils = require('./utils/common');
 const mongooseClient = require('./db/mongoose-client');
@@ -12,23 +16,60 @@ const users = require('./db/users');
 const lounges = require('./db/lounges');
 const activeLounges = require('./db/activeLounges');
 
-// Load configurations
-const config = require('./config.json');
-const { ObjectId } = require('mongodb');
+const getKey = () => {
+  const { SERVER_ENV, DEV_KEY, PROD_KEY } = process.env;
+  const key = SERVER_ENV === 'dev' ? DEV_KEY : PROD_KEY;
+  return fs.readFileSync(key);
+};
+
+const getCert = () => {
+  const { SERVER_ENV, DEV_CERT, PROD_CERT } = process.env;
+  const cert = SERVER_ENV === 'dev' ? DEV_CERT : PROD_CERT;
+  return fs.readFileSync(cert);
+};
 
 // Create server
 const server = https.createServer({
-  key: fs.readFileSync('ssl/chlsgong_com.key'),
-  cert: fs.readFileSync('ssl/chlsgong_com.crt'),
+  key: getKey(),
+  cert: getCert(),
 }, app);
+
+// CORS
+
+const originWhitelist = [
+  'http://localhost:3000',
+  'https://chlsgong.com',
+];
+
+const methodWhitelist = [
+  'GET',
+  'POST',
+  'PUT',
+];
+
+const corsOptions = {
+  origin: originWhitelist,
+  methods: methodWhitelist,
+};
+
+// Socket IO
+
+const io = socket(server, { cors: corsOptions });
+
+io.on('connection', _ => {
+  console.log('a user connected');
+});
+
+io.on('lounge-joined', data => {
+  console.log('data', data);
+});
 
 // Connect to database
 mongooseClient.connect();
 
 // Endpoints
 
-// TODO: configure cors to only allow webapp origin
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.get('/', (_, res) => {
   res.send('Hello World!');
@@ -200,7 +241,7 @@ app.put('/user/test', (req, res) => {
 });
 
 // Start server
-const { sslPort } = config;
-server.listen(sslPort, () => {
-  console.log(`App listening on port ${sslPort}!`);
+const { SSL_PORT } = process.env;
+server.listen(SSL_PORT, () => {
+  console.log(`App listening on port ${SSL_PORT}!`);
 });

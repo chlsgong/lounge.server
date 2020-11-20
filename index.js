@@ -38,6 +38,7 @@ const server = https.createServer({
 
 const originWhitelist = [
   'http://localhost:3000',
+  'https://localhost:3000',
   'https://chlsgong.com',
 ];
 
@@ -56,12 +57,48 @@ const corsOptions = {
 
 const io = socket(server, { cors: corsOptions });
 
-io.on('connection', _ => {
+io.on('connect', socket => {
   console.log('a user connected');
-});
 
-io.on('lounge-joined', data => {
-  console.log('data', data);
+  socket.on('open-lounge', data => {
+    const { loungeId } = data;	
+    console.log('open lounge:', loungeId);
+    socket.join(loungeId);
+
+    // const ids = await io.in(loungeId).allSockets();
+    // console.log('sockets in room', ids);
+  });	
+
+  socket.on('join-lounge', data => {
+    const { loungeId } = data;	
+    console.log('join lounge:', loungeId);
+    socket.join(loungeId);
+
+    // const ids = await io.in(loungeId).allSockets();
+    // console.log('sockets in room', ids);
+  });
+
+  socket.on('close-lounge', data => {
+    const { loungeId } = data;	
+    console.log('close lounge:', loungeId);
+
+    // Notify all guests in this room that they have been kicked
+    socket.in(loungeId).emit('lounge-closed');
+
+    io.in(loungeId).allSockets()
+      .then(ids => {
+        // console.log('sockets in room', ids);
+
+        // Remove all sockets in the room
+        ids.forEach(id => io.sockets.sockets?.get(id)?.leave(loungeId));
+      });
+  });
+
+  socket.on('disconnect', reason => {
+    console.log('disconnect', reason);
+
+    // Socket gets automatically removed from rooms if disconnected
+  });
 });
 
 // Connect to database

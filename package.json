@@ -10,7 +10,7 @@
     "db": "sudo systemctl start mongod",
     "db:mac": "mongod --dbpath=/Users/charles/Documents/workspace/skydragon/lounge/lounge.server/data/db",
     "ports": "netstat -tulpn",
-    "deploy": "./deploy.sh"
+    "deploy": "./scripts/deploy.sh"
   },
   "author": "Charles Gong",
   "license": "ISC",

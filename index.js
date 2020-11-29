@@ -169,7 +169,7 @@ app.post('/lounge', (req, res) => {
   const name = _.get(req.body, 'name');
   const refreshToken = _.get(req.body, 'refresh_token');
   // TODO: remove here and generate in active lounges
-  const code = commonUtils.createBase36(6);
+  const code = commonUtils.createCode(6);
 
   // create lounge
   lounges.createLounge({ hostId, name, code, refreshToken })

@@ -2,18 +2,18 @@ const getRandomInt = (max) => {
   return Math.floor(Math.random() * max);
 };
 
-const createBase36 = (length) => {
-  const base36Chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const createCode = (length) => {
+  const baseChars = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 
-  let base36String = '';
+  let baseString = '';
   for (let i = 0; i < length; i++) {
-    base36String += base36Chars.charAt(getRandomInt(base36Chars.length));
+    baseString += baseChars.charAt(getRandomInt(baseChars.length));
   }
 
-  return base36String;
+  return baseString;
 };
 
 module.exports = {
   getRandomInt,
-  createBase36,
+  createCode,
 };

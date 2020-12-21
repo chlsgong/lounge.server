@@ -39,7 +39,8 @@ const server = https.createServer({
 const originWhitelist = [
   'http://localhost:3000',
   'https://localhost:3000',
-  'https://chlsgong.com',
+  // 'https://chlsgong.com',
+  'https://loungemusic.app',
 ];
 
 const methodWhitelist = [
